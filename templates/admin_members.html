@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Members — Hospital IoT{% endblock %}
+{% block nav_members %}active{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="page-title"><i class="fas fa-users me-2" style="color:var(--accent)"></i>All Users</div>
+        <div class="page-subtitle">// USER MANAGEMENT</div>
+    </div>
+    <a href="/register" class="btn btn-sm" style="background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:0.75rem;letter-spacing:1px;">
+        <i class="fas fa-user-plus me-1"></i> Add User
+    </a>
+</div>
+
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Assigned Sensor</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td style="color:#e0e0e0;font-weight:600;">{{ user.username }}</td>
+            <td>
+                {% if user.role == 'admin' %}
+                <span style="color:#ff6b35;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);padding:2px 10px;border-radius:20px;font-size:0.7rem;letter-spacing:1px;">ADMIN</span>
+                {% else %}
+                <span style="color:var(--accent);background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.2);padding:2px 10px;border-radius:20px;font-size:0.7rem;letter-spacing:1px;">MEMBER</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if user.sensor %}
+                {% set icons = {'dht22': '🌡️', 'ldr': '💡', 'pir': '🏃', 'bodytemp': '🩺', 'camera': '📷'} %}
+                {{ icons.get(user.sensor, '📡') }} {{ user.sensor|upper }}
+                {% else %}
+                <span style="color:var(--muted);">—</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if user.sensor %}
+                <a href="/admin/sensor/{{ user.sensor }}" style="color:var(--accent);font-size:0.75rem;font-family:'Share Tech Mono',monospace;text-decoration:none;">
+                    <i class="fas fa-chart-line me-1"></i>View Sensor
+                </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

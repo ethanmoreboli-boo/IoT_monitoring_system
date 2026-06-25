@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}DHT22 Sensor{% endblock %}
+{% block nav_dht %}active{% endblock %}
+{% block nav_my_sensor %}active{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">🌡️ DHT22 Sensor</div>
+        <div class="page-subtitle">// TEMPERATURE & HUMIDITY READINGS</div>
+    </div>
+    {% if is_admin %}<a href="/admin/dashboard" class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:1px;"><i class="fas fa-arrow-left me-1"></i>Dashboard</a>{% endif %}
+</div>
+
+<div class="row g-3 mb-1">
+    <div class="col-md-6">
+        <div class="graph-card" style="margin-bottom:0;">
+            <div class="graph-label"><i class="fas fa-thermometer-half me-2"></i>Temperature Over Time</div>
+            {% if graph_temp %}
+            <img src="data:image/png;base64,{{ graph_temp }}" alt="Temperature">
+            {% else %}
+            <div class="no-data">No data yet</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="graph-card" style="margin-bottom:0;">
+            <div class="graph-label"><i class="fas fa-tint me-2"></i>Humidity Over Time</div>
+            {% if graph_hum %}
+            <img src="data:image/png;base64,{{ graph_hum }}" alt="Humidity">
+            {% else %}
+            <div class="no-data">No data yet</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="data-table" style="margin-top:1.5rem;">
+    <table class="table">
+        <thead><tr><th>#</th><th>Temperature (°C)</th><th>Humidity (%)</th><th>Timestamp</th></tr></thead>
+        <tbody>
+        {% if data %}
+            {% for row in data|reverse %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td style="color:#ff6b6b;font-weight:600;">{{ row.temperature }}°C</td>
+                <td style="color:#48cae4;font-weight:600;">{{ row.humidity }}%</td>
+                <td>{{ row.time }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="4" class="no-data">No sensor data yet</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

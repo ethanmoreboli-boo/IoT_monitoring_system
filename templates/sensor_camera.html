@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}ESP32 Camera{% endblock %}
+{% block nav_camera %}active{% endblock %}
+{% block nav_my_sensor %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">📷 ESP32 Camera</div>
+        <div class="page-subtitle">// LIVE STREAM (AUTO REFRESH)</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+        <span style="color:#06d6a0;font-family:'Share Tech Mono';font-size:0.7rem;">
+            ● LIVE
+        </span>
+    </div>
+</div>
+
+<!-- LIVE GRID -->
+<div class="row g-3" id="camGrid">
+
+    {% for img in images %}
+    <div class="col-md-3 col-sm-4 col-6">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all 0.2s;"
+             onmouseover="this.style.borderColor='#a855f7';this.style.transform='translateY(-3px)'"
+             onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+
+            <img src="/static/images/{{ img.filename }}"
+                 style="width:100%;height:180px;object-fit:cover;">
+
+            <div style="padding:0.6rem 0.8rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--muted);">
+                <i class="fas fa-clock me-1"></i>{{ img.time }}
+            </div>
+
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+<!-- EMPTY STATE -->
+{% if images|length == 0 %}
+<div class="no-data" style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:4rem;">
+    <i class="fas fa-camera fa-3x mb-3 d-block" style="color:var(--border);"></i>
+    <p>No images yet</p>
+    <small>Waiting for ESP32-CAM stream...</small>
+</div>
+{% endif %}
+
+<!-- LIVE AUTO REFRESH SCRIPT -->
+<script>
+
+async function refreshCamera() {
+    try {
+        const res = await fetch('/api/camera/live');
+        const data = await res.json();
+
+        let grid = document.getElementById("camGrid");
+        grid.innerHTML = "";
+
+        data.forEach(img => {
+
+            grid.innerHTML += `
+                <div class="col-md-3 col-sm-4 col-6">
+                    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+
+                        <img src="/static/images/${img.filename}"
+                             style="width:100%;height:180px;object-fit:cover;">
+
+                        <div style="padding:0.6rem 0.8rem;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--muted);">
+                            ⏱ ${img.time}
+                        </div>
+
+                    </div>
+                </div>
+            `;
+        });
+
+    } catch (e) {
+        console.log("Camera refresh error", e);
+    }
+}
+
+// refresh every 2 seconds (LIVE FEEL)
+setInterval(refreshCamera, 2000);
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}LDR Sensor{% endblock %}
+{% block nav_sensor %}active{% endblock %}
+{% block nav_my_sensor %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">💡 LDR Sensor Monitor</div>
+        <div class="page-subtitle">// REAL-TIME LIGHT INTENSITY DATA</div>
+    </div>
+
+    {% if is_admin %}
+    <a href="/admin/dashboard"
+       class="btn btn-sm"
+       style="
+            background:transparent;
+            border:1px solid var(--border);
+            color:var(--muted);
+            font-family:'Share Tech Mono', monospace;
+            font-size:0.7rem;
+            letter-spacing:1px;
+       ">
+        <i class="fas fa-arrow-left me-1"></i>Dashboard
+    </a>
+    {% endif %}
+</div>
+
+{% if data and data|length > 0 %}
+
+    {% set latest = data[0]['light'] %}
+
+    <!-- STATUS CARDS -->
+    <div class="row g-3 mb-4">
+
+        <!-- LIGHT VALUE -->
+        <div class="col-md-4">
+            <div style="
+                background:var(--card);
+                border:1px solid var(--border);
+                border-radius:14px;
+                padding:1.2rem;
+                height:100%;
+            ">
+
+                <div style="
+                    font-family:'Share Tech Mono', monospace;
+                    color:var(--muted);
+                    font-size:0.75rem;
+                    letter-spacing:1px;
+                    margin-bottom:0.5rem;
+                ">
+                    CURRENT LIGHT LEVEL
+                </div>
+
+                <div style="
+                    font-size:2rem;
+                    font-weight:700;
+                    color:var(--accent);
+                ">
+                    {{ latest }}
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ENVIRONMENT -->
+        <div class="col-md-4">
+            <div style="
+                background:var(--card);
+                border:1px solid var(--border);
+                border-radius:14px;
+                padding:1.2rem;
+                height:100%;
+            ">
+
+                <div style="
+                    font-family:'Share Tech Mono', monospace;
+                    color:var(--muted);
+                    font-size:0.75rem;
+                    letter-spacing:1px;
+                    margin-bottom:0.5rem;
+                ">
+                    ENVIRONMENT STATUS
+                </div>
+
+                {% if latest < 2000 %}
+                    <div style="
+                        font-size:1.3rem;
+                        font-weight:700;
+                        color:#ef4444;
+                    ">
+                        🌙 DARK
+                    </div>
+                {% else %}
+                    <div style="
+                        font-size:1.3rem;
+                        font-weight:700;
+                        color:#22c55e;
+                    ">
+                        ☀️ BRIGHT
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- LED STATUS -->
+        <div class="col-md-4">
+            <div style="
+                background:var(--card);
+                border:1px solid var(--border);
+                border-radius:14px;
+                padding:1.2rem;
+                height:100%;
+            ">
+
+                <div style="
+                    font-family:'Share Tech Mono', monospace;
+                    color:var(--muted);
+                    font-size:0.75rem;
+                    letter-spacing:1px;
+                    margin-bottom:0.5rem;
+                ">
+                    LED STATUS
+                </div>
+
+                {% if latest < 2000 %}
+                    <div style="
+                        font-size:1.3rem;
+                        font-weight:700;
+                        color:#22c55e;
+                    ">
+                        💡 ON
+                    </div>
+                {% else %}
+                    <div style="
+                        font-size:1.3rem;
+                        font-weight:700;
+                        color:#ef4444;
+                    ">
+                        ⚫ OFF
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+
+{% endif %}
+
+<!-- GRAPH -->
+<div style="
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:1rem;
+    margin-bottom:1.5rem;
+">
+
+    <div style="
+        font-family:'Share Tech Mono', monospace;
+        color:var(--muted);
+        font-size:0.75rem;
+        letter-spacing:1px;
+        margin-bottom:1rem;
+    ">
+        LIGHT SENSOR GRAPH
+    </div>
+
+    <img src="data:image/png;base64,{{ graph }}"
+         alt="LDR Graph"
+         style="
+            width:100%;
+            border-radius:10px;
+         ">
+
+</div>
+
+<!-- TABLE -->
+<div style="
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    overflow:hidden;
+">
+
+    <div style="
+        padding:1rem;
+        border-bottom:1px solid var(--border);
+        font-family:'Share Tech Mono', monospace;
+        color:var(--muted);
+        font-size:0.75rem;
+        letter-spacing:1px;
+    ">
+        SENSOR DATA LOGS
+    </div>
+
+    <div class="table-responsive">
+
+        <table class="table mb-0" style="color:white;">
+
+            <thead style="background:#111827;">
+
+                <tr>
+                    <th>ID</th>
+                    <th>Light Value</th>
+                    <th>Date & Time</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for row in data %}
+
+                <tr style="border-color:var(--border);">
+
+                    <td>{{ row['id'] }}</td>
+                    <td>{{ row['light'] }}</td>
+                    <td>{{ row['time'] }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% if not data or data|length == 0 %}
+
+<div class="no-data"
+     style="
+        background:var(--card);
+        border:1px solid var(--border);
+        border-radius:14px;
+        padding:4rem;
+        text-align:center;
+        margin-top:2rem;
+     ">
+
+    <i class="fas fa-lightbulb fa-3x mb-3 d-block"
+       style="color:var(--border);"></i>
+
+    <p>No LDR data available</p>
+
+    <small>
+        Sensor data will appear when ESP32 posts to
+        <code style="color:var(--accent);">/api/ldr</code>
+    </small>
+
+</div>
+
+{% endif %}
+<script>
+setInterval(() => {
+    location.reload();
+}, 3000);
+</script>
+
+{% endblock %}

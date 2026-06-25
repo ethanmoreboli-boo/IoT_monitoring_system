@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}PIR Motion Sensor{% endblock %}
+{% block nav_pir %}active{% endblock %}
+{% block nav_my_sensor %}active{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">🏃 PIR Motion Sensor</div>
+        <div class="page-subtitle">// MOTION DETECTION EVENTS</div>
+    </div>
+    {% if is_admin %}<a href="/admin/dashboard" class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:1px;"><i class="fas fa-arrow-left me-1"></i>Dashboard</a>{% endif %}
+</div>
+
+<div class="graph-card">
+    <div class="graph-label"><i class="fas fa-chart-line me-2"></i>Motion Events Over Time</div>
+    {% if graph %}
+    <img src="data:image/png;base64,{{ graph }}" alt="PIR Graph">
+    {% else %}
+    <div class="no-data"><i class="fas fa-chart-line fa-2x mb-3 d-block"></i>No data yet</div>
+    {% endif %}
+</div>
+
+<div class="data-table">
+    <table class="table">
+        <thead><tr><th>#</th><th>Motion</th><th>Timestamp</th></tr></thead>
+        <tbody>
+        {% if data %}
+            {% for row in data|reverse %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>
+                    {% if row.motion == 1 %}
+                    <span class="badge-motion badge-detected"><i class="fas fa-running me-1"></i>DETECTED</span>
+                    {% else %}
+                    <span class="badge-motion badge-none">NO MOTION</span>
+                    {% endif %}
+                </td>
+                <td>{{ row.time }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="3" class="no-data">No sensor data yet</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

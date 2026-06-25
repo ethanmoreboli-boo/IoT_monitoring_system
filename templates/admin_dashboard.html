@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — Hospital IoT{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+{% block extra_css %}
+<style>
+    .stat-card {
+        background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+        padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1.25rem;
+        transition: all 0.25s; text-decoration: none; color: var(--text);
+        border-left: 3px solid var(--accent);
+    }
+    .stat-card:hover { transform: translateY(-3px); border-color: var(--accent); color: var(--text); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .stat-icon { font-size: 2rem; width: 50px; text-align: center; flex-shrink: 0; }
+    .stat-info .value { font-size: 1.5rem; font-weight: 700; color: var(--accent); line-height: 1.1; }
+    .stat-info .label { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    .stat-info .sublabel { font-size: 0.8rem; color: var(--muted); margin-top: 0.1rem; }
+
+    .member-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+    .member-card {
+        background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+        padding: 1.5rem; text-align: center; transition: all 0.25s; text-decoration: none; color: var(--text);
+    }
+    .member-card:hover { border-color: var(--accent); transform: translateY(-3px); color: var(--text); box-shadow: 0 12px 30px rgba(0,0,0,0.3); }
+    .member-avatar {
+        width: 60px; height: 60px; border-radius: 50%;
+        background: rgba(0,229,255,0.1); border: 2px solid rgba(0,229,255,0.2);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; margin: 0 auto 1rem;
+    }
+    .member-name { font-weight: 700; font-size: 1rem; letter-spacing: 1px; }
+    .member-sensor {
+        font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+        color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-top: 0.25rem;
+    }
+
+ .sensor-colors {
+    --ldr: #ffd166;
+    --dht22: #ff6b6b;
+    --pir: #06d6a0;
+    --bodytemp: #ef476f;
+    --camera: #a855f7;
+}
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="page-title"><i class="fas fa-shield-halved me-2" style="color:var(--admin-color)"></i>Admin Dashboard</div>
+        <div class="page-subtitle">// SYSTEM OVERVIEW — ALL NODES ACTIVE</div>
+    </div>
+    <a href="/register" class="btn btn-sm" style="background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:0.75rem;letter-spacing:1px;">
+        <i class="fas fa-user-plus me-1"></i> Add User
+    </a>
+</div>
+
+<!-- Sensor quick stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4 col-lg">
+        <a href="/admin/sensor/dht22" class="stat-card" style="border-left-color:#ff6b6b;">
+            <div class="stat-icon">🌡️</div>
+            <div class="stat-info">
+                <div class="value" style="color:#ff6b6b;">
+                    {% if stats.dht22 %}{{ stats.dht22.temperature }}°C{% else %}—{% endif %}
+                </div>
+                <div class="label">DHT22</div>
+                <div class="sublabel">{% if stats.dht22 %}{{ stats.dht22.humidity }}% hum{% else %}No data{% endif %}</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 col-lg">
+        <a href="/admin/sensor/ldr" class="stat-card" style="border-left-color:#ffd166;">
+            <div class="stat-icon">💡</div>
+            <div class="stat-info">
+                <div class="value" style="color:#ffd166;">
+                    {% if stats.ldr %}{{ stats.ldr.light }}{% else %}—{% endif %}
+                </div>
+                <div class="label">LDR</div>
+                <div class="sublabel">Light Level</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 col-lg">
+        <a href="/admin/sensor/pir" class="stat-card" style="border-left-color:#06d6a0;">
+            <div class="stat-icon">🏃</div>
+            <div class="stat-info">
+                <div class="value" style="color:#06d6a0;">
+                    {% if stats.pir %}{% if stats.pir.motion %}YES{% else %}NO{% endif %}{% else %}—{% endif %}
+                </div>
+                <div class="label">PIR</div>
+                <div class="sublabel">Motion Status</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 col-lg">
+        <a href="/admin/sensor/bodytemp" class="stat-card" style="border-left-color:#ef476f;">
+            <div class="stat-icon">🩺</div>
+            <div class="stat-info">
+                <div class="value" style="color:#ef476f;">
+                    {% if stats.bodytemp %}{{ stats.bodytemp.temperature }}°C{% else %}—{% endif %}
+                </div>
+                <div class="label">Body Temp</div>
+                <div class="sublabel">Patient Reading</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4 col-lg">
+        <a href="/admin/sensor/camera" class="stat-card" style="border-left-color:#a855f7;">
+            <div class="stat-icon">📷</div>
+            <div class="stat-info">
+                <div class="value" style="color:#a855f7;">
+                    {% if stats.camera %}{{ stats.camera.cnt }}{% else %}0{% endif %}
+                </div>
+                <div class="label">Camera</div>
+                <div class="sublabel">Total images</div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Member nodes -->
+<div class="iot-card">
+    <div class="iot-card-header"><i class="fas fa-users me-2"></i>Member Nodes ({{ members|length }})</div>
+    {% if members %}
+    <div class="member-grid">
+        {% for member in members %}
+        {% set icons = {'dht22': '🌡️', 'ldr': '💡', 'pir': '🏃', 'bodytemp': '🩺', 'camera': '📷'} %}
+        <a href="/admin/sensor/{{ member.sensor }}" class="member-card">
+            <div class="member-avatar">{{ icons.get(member.sensor, '📡') }}</div>
+            <div class="member-name">{{ member.username }}</div>
+            <div class="member-sensor">{{ member.sensor or 'No sensor' }}</div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="no-data"><i class="fas fa-users fa-2x mb-3 d-block"></i>No members registered yet.<br><small><a href="/register" style="color:var(--accent);">Add a member</a></small></div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Body Temperature{% endblock %}
+{% block nav_bodytemp %}active{% endblock %}
+{% block nav_my_sensor %}active{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <div class="page-title">🩺 Body Temperature</div>
+        <div class="page-subtitle">// DS18B20 PATIENT READINGS</div>
+    </div>
+    {% if is_admin %}<a href="/admin/dashboard" class="btn btn-sm" style="background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:1px;"><i class="fas fa-arrow-left me-1"></i>Dashboard</a>{% endif %}
+</div>
+
+<div class="graph-card">
+    <div class="graph-label"><i class="fas fa-chart-line me-2"></i>Body Temperature Over Time</div>
+    {% if graph %}
+    <img src="data:image/png;base64,{{ graph }}" alt="Body Temp Graph">
+    {% else %}
+    <div class="no-data"><i class="fas fa-chart-line fa-2x mb-3 d-block"></i>No data yet</div>
+    {% endif %}
+</div>
+
+<div class="data-table">
+    <table class="table">
+        <thead><tr><th>#</th><th>Temperature</th><th>Status</th><th>Timestamp</th></tr></thead>
+        <tbody>
+        {% if data %}
+           {% for row in data %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>
+                    {% if row.temperature > 37.5 %}
+                    <span class="temp-high" style="font-weight:700;">{{ row.temperature }}°C</span>
+                    {% elif row.temperature < 36.0 %}
+                    <span class="temp-low" style="font-weight:700;">{{ row.temperature }}°C</span>
+                    {% else %}
+                    <span class="temp-normal" style="font-weight:700;">{{ row.temperature }}°C</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if row.temperature > 37.5 %}
+                    <span style="color:#ef476f;font-family:'Share Tech Mono',monospace;font-size:0.75rem;">⚠ HIGH</span>
+                    {% elif row.temperature < 36.0 %}
+                    <span style="color:#48cae4;font-family:'Share Tech Mono',monospace;font-size:0.75rem;">❄ LOW</span>
+                    {% else %}
+                    <span style="color:#06d6a0;font-family:'Share Tech Mono',monospace;font-size:0.75rem;">✓ NORMAL</span>
+                    {% endif %}
+                </td>
+                <td>{{ row.time }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="4" class="no-data">No sensor data yet</td></tr>
+        {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
