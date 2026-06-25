@@ -152,7 +152,7 @@ def make_graph(x, y, title, xlabel, ylabel, color='#00b4d8'):
 # ========================
 @app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("landing.html")
+    return render_template("index.html")
 
 @app.route("/login/<node_type>", methods=["GET", "POST"])
 def login(node_type):
